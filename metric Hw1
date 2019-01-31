@@ -1,0 +1,34 @@
+##The Emprical Homework By Jiwei Zhou
+
+mishkin <- read_excel("D:/Zjw'sDoc/PhD Student/Metric2/mishkin.xls")
+View(mishkin)
+##Qusetion(d)
+##Compute the inflation Rate
+inflation<-c()
+for (i in 1:223) {
+       inflation[i]<-((mishkin$CPI[i+35]/mishkin$CPI[i+34])^12-1)*100
+}
+intrest<-mishkin$TB1[36:258]
+##Compute the Real Interest Rate
+real.interest<-intrest-inflation
+mean(real.interest)
+sd(real.interest)
+##Get the Ljung-Box Q Statistics
+Q<-c()
+for(i in 1:12){
+  Q[i]=Box.test(real.interest,lag = i,type = "Ljung")$statistic
+}
+##Get the p-value
+P<-c()
+for(i in 1:12){
+  P[i]=Box.test(real.interest,lag = i,type = "Ljung")$p.value
+}
+print(Q)
+print(P)
+##We get exactly same result as the textbook shows
+
+##Qusetion (e)
+library(sandwich)
+library(lmtest)
+m <- lm(inflation ~ intrest)
+coeftest(m, vcov = vcovHC(m, type="HC"))
